@@ -5,7 +5,7 @@ import logger from '../logger';
 const router = Router();
 
 router.get('/health', (_req, res) => {
-  logger.info(`GET /health`);
+  logger.debug(`GET /health`);
   res.status(200).json({
     success: true,
     msg: 'Health check OK',
