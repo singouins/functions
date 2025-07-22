@@ -14,7 +14,7 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
 }
 
 router.post('/:uuid/unload', asyncHandler(async (req: Request, res: Response) => {
-  logger.info(`POST /item/${req.params.uuid}/unload`);
+  logger.info(`POST /${req.params.uuid}/unload`);
 
   const { uuid } = req.params;
 
