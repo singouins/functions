@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import { connectMongo } from './mongo/mongoClient';
 import reloadRoute from './routes/reload';
+import unloadRoute from './routes/unload';
 import healthRoute from './routes/health';
 import logger from './logger';
 
@@ -11,8 +12,9 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use('/', healthRoute);      // Route /health
-app.use('/item', reloadRoute);  // Route /item/:uuid/reload
+app.use('/', healthRoute);  // Route /health
+app.use('/', reloadRoute);  // Route /:uuid/reload
+app.use('/', unloadRoute);  // Route /:uuid/unload
 
 connectMongo()
   .then(() => {
