@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
-import logger from '../logger';
+import logger from '../../logger';
 
-import Item from '../models/Item';
-import metaWeapon from '../models/metaWeapon';
+import Item from '../../models/Item';
+import metaWeapon from '../../models/metaWeapon';
 
 const router = express.Router();
 

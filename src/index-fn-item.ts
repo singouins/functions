@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 
 import { connectMongo } from './mongo/mongoClient';
-import createRoute from './routes/create';
-import deleteRoute from './routes/delete';
-import reloadRoute from './routes/reload';
-import unloadRoute from './routes/unload';
+import createRoute from './routes/item/create';
+import deleteRoute from './routes/item/delete';
+import reloadRoute from './routes/item/reload';
+import unloadRoute from './routes/item/unload';
 import healthRoute from './routes/health';
 import logger from './logger';
 

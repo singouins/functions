@@ -1,9 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
-import logger from '../logger';
-import Item from '../models/Item';
-import metaWeapon from '../models/metaWeapon';
-import Satchel, { SatchelAmmo } from '../models/Satchel';
-import { consumePA, getPA } from '../redis/redisUtils';
+import logger from '../../logger';
+import Item from '../../models/Item';
+import metaWeapon from '../../models/metaWeapon';
+import Satchel, { SatchelAmmo } from '../../models/Satchel';
+import { consumePA, getPA } from '../../redis/redisUtils';
 
 const router = express.Router();
 
@@ -13,8 +13,8 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
   };
 }
 
-router.post('/:uuid/unload', asyncHandler(async (req: Request, res: Response) => {
-  logger.info(`POST /${req.params.uuid}/unload`);
+router.post('/:uuid/reload', asyncHandler(async (req: Request, res: Response) => {
+  logger.info(`POST /${req.params.uuid}/reload`);
 
   const { uuid } = req.params;
 
@@ -66,20 +66,20 @@ router.post('/:uuid/unload', asyncHandler(async (req: Request, res: Response) =>
      });
   }
 
-  if (item.ammo == 0) {
-    logger.warn(`Item.id:${uuid} is already empty (item.ammo == ${item.ammo})`);
+  if (item.ammo == meta.max_ammo) {
+    logger.warn(`Item.id:${uuid} is already full (item.ammo == ${meta.max_ammo})`);
     return res.status(200).json({ 
         success: false,
-        msg: `Item.id:${uuid} is already empty (item.ammo == ${item.ammo})`,
+        msg: `Item.id:${uuid} is already full (item.ammo == ${meta.max_ammo})`,
         payload: item
      });
   }
 
-  // We add back in the Satchel the amount of ammo we unloaded
+  // We remove from the Satchel the amount of ammo we reloaded
   try {
-    if (meta.caliber){
+    if (meta.caliber && typeof meta.max_ammo === 'number'){
       logger.debug(`Item.id:${uuid} is using ${meta.caliber} ammo`);
-      satchel.ammo[meta.caliber as keyof SatchelAmmo] += item.ammo;
+      satchel.ammo[meta.caliber as keyof SatchelAmmo] -= meta.max_ammo;
       satchel.updated = new Date();
       await satchel.save();
     }
@@ -87,11 +87,13 @@ router.post('/:uuid/unload', asyncHandler(async (req: Request, res: Response) =>
     logger.error(`Item.id:${uuid} Unable to store ammo in Satchel: ${err}`)
   }
 
-  // We empty the amount of item.ammo
+  // We maxx the amount of item.ammo
   try {
-    item.ammo = 0;
-    item.updated = new Date();
-    await item.save();
+    if (typeof meta.max_ammo === 'number'){
+      item.ammo = meta.max_ammo;
+      item.updated = new Date();
+      await item.save();
+    }
   } catch (err) {
     logger.error(`Item.id:${uuid} Unable to empty item.ammo: ${err}`)
   }
@@ -108,10 +110,10 @@ router.post('/:uuid/unload', asyncHandler(async (req: Request, res: Response) =>
     logger.error(`Creature.id:${item.bearer} Unable to consume PA: ${err}`)
   }
 
-  logger.info(`Item.id:${uuid} unloaded`);
+  logger.info(`Item.id:${uuid} reloaded`);
   return res.status(200).json({
     success: true,
-    msg: `Item.id:${uuid} unloaded successfully`,
+    msg: `Item.id:${uuid} reloaded successfully`,
     payload: {
       item: item,
       pa: await getPA(item.bearer),

@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import logger from '../logger';
-import Item from '../models/Item';
+import logger from '../../logger';
+import Item from '../../models/Item';
 
 const router = express.Router();
 
