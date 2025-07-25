@@ -18,6 +18,7 @@ interface SatchelShard {
   rare: number;
   epic: number;
   legendary: number;
+  [key: string]: number;
 }
 
 export interface SatchelAmmo {

@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 
 import { connectMongo } from './mongo/mongoClient';
 import createRoute from './routes/item/create';
+import catalyzeRoute from './routes/item/catalyze';
 import deleteRoute from './routes/item/delete';
 import reloadRoute from './routes/item/reload';
 import unloadRoute from './routes/item/unload';
@@ -14,11 +15,12 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
-app.use('/', healthRoute);  // GET    /health
-app.use('/', createRoute);  // POST   /
-app.use('/', deleteRoute);  // DELETE /:uuid
-app.use('/', reloadRoute);  // POST   /:uuid/reload
-app.use('/', unloadRoute);  // POST   /:uuid/unload
+app.use('/', healthRoute);    // GET    /health
+app.use('/', createRoute);    // POST   /
+app.use('/', deleteRoute);    // DELETE /:uuid
+app.use('/', catalyzeRoute);  // POST   /:uuid/catalyze
+app.use('/', reloadRoute);    // POST   /:uuid/reload
+app.use('/', unloadRoute);    // POST   /:uuid/unload
 
 connectMongo()
   .then(() => {
