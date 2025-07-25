@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IMetaWeapon extends Document {
+export interface IMetaArmor extends Document {
   _id: number;
   arpen: number;
   burst_acc: number | null;
@@ -31,7 +31,7 @@ export interface IMetaWeapon extends Document {
   tier: number;
 }
 
-const MetaWeaponSchema: Schema = new Schema<IMetaWeapon>({
+const MetaArmorSchema: Schema = new Schema<IMetaArmor>({
   _id: { type: Number, required: true },
   arpen: { type: Number, required: true },
   burst_acc: { type: Number, default: null },
@@ -61,10 +61,9 @@ const MetaWeaponSchema: Schema = new Schema<IMetaWeapon>({
   size: { type: String, required: true },
   tier: { type: Number, required: true }
 }, {
-  collection: '_metaweapons',  // specify collection name if needed
-  versionKey: false,          // no __v field, optional
+  collection: '_metaArmors'
 });
 
-const metaWeapon = mongoose.model<IMetaWeapon>('metaWeapon', MetaWeaponSchema);
+const metaArmor = mongoose.model<IMetaArmor>('metaArmor', MetaArmorSchema);
 
-export default metaWeapon;
+export default metaArmor;
