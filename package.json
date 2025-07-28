@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev-item": "ts-node-dev --respawn src/index-fn-item.ts",
+    "dev-auction": "ts-node-dev --respawn src/index-fn-auction.ts",
     "start-item": "node dist/index-fn-item.js",
+    "start-auction": "node dist/index-fn-auction.js",
     "start": "while true; do sleep 30; done;"
   },
   "keywords": [],
@@ -17,6 +19,7 @@
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "ioredis": "^5.6.1",
+    "mongodb-query-parser": "^4.4.2",
     "mongoose": "^8.16.1",
     "uuid": "^11.1.0",
     "winston": "^3.17.0"

@@ -7,7 +7,6 @@ type ItemRarity = typeof ITEM_RARITY[number];
 export interface IItem extends Document {
   _id: string;
   ammo?: number;
-  auctioned: boolean;
   bearer: string;
   bound: boolean;
   bound_type: string;
@@ -28,7 +27,6 @@ const ItemSchema = new Schema<IItem>({
 
   ammo: { type: Number, default: null },
 
-  auctioned: { type: Boolean, required: true, default: false },
   bearer: { type: String, required: true },
   bound: { type: Boolean, required: true, default: true },
   bound_type: { type: String, required: true, default: 'BoP' },
