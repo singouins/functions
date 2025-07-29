@@ -1,3 +1,4 @@
+const start = performance.now();
 import express, { Request, Response, NextFunction } from 'express';
 
 import { connectMongo } from './mongo/mongoClient';
@@ -18,7 +19,7 @@ app.use('/', searchRoute);    // POST   /search
 
 connectMongo()
   .then(() => {
-    app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));
+    app.listen(PORT, () => logger.info(`Server running on port ${PORT} after ${performance.now() - start} ms`));
   })
   .catch(err => {
     logger.error(`Failed to start server: ${err}`);
@@ -44,7 +45,7 @@ async function startServer() {
     await connectMongo();
 
     app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
+      logger.info(`Server running on port ${PORT} after ${performance.now() - start} ms`);
     });
   } catch (err) {
     logger.error(`Failed to start server: ${err}`);
