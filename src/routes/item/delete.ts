@@ -1,6 +1,10 @@
+// routes/item/delete.ts
+
 import express, { Request, Response, NextFunction } from 'express';
+import { param, validationResult } from 'express-validator';
 import logger from '../../logger';
-import Item from '../../models/Item';
+
+import { fetchItemMiddleware, assertItemPresent } from '../../middlewares/fetch-item';
 
 const router = express.Router();
 
@@ -10,31 +14,38 @@ function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => P
   };
 }
 
-router.delete('/:uuid', asyncHandler(async (req: Request, res: Response) => {
-  logger.info(`DELETE /${req.params.uuid}`);
+router.delete(
+  '/:item_uuid',
+  [
+    param('item_uuid')
+      .isUUID(4)
+      .withMessage('Invalid UUID format'),
+    ],
+  asyncHandler(fetchItemMiddleware),
+  asyncHandler(async (req: Request, res: Response) => {
+    // Check validation result
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
-  const { uuid } = req.params;
+    const { item_uuid } = req.params;
+    logger.info(`DELETE /${req.params.item_uuid}`);
 
-  // We look for the related Item
-  const item = await Item.findById(uuid).exec();
-  if (!item) {
-    logger.warn(`Item.id:${uuid} not found`);
-    return res.status(200).json({ 
-        success: false,
-        msg: `Item.id:${uuid} not found`,
-        payload: null
-     });
-  } else {
-    logger.debug(`Item.id:${uuid} found`);
-    await item.deleteOne(); // This deletes the document from MongoDB
+    // We check middleware functions didn't screw up
+    assertItemPresent(req)
+
+    try {
+      await req.item.deleteOne(); // This deletes the document from MongoDB
+      const msg = `Item.id:${item_uuid} destroyed`
+      logger.verbose(msg);
+      return res.status(204).json({ success: true, msg: msg, payload: {item: req.item} });
+    } catch (err) {
+      const msg = `Item.id:${item_uuid} deletion failed: ${err}`
+      logger.error(msg)
+      return res.status(200).json({ success: false, msg: msg, payload: null });
+    }
   }
-
-  logger.info(`Item.id:${uuid} destroyed`);
-  return res.status(204).json({
-    success: true,
-    msg: `Item.id:${uuid} destroyed successfully`,
-    payload: null
-  });
-}));
+));
 
 export default router;
