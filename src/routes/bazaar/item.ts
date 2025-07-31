@@ -2,6 +2,7 @@
 
 import express, { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator';
+import logger from '../../logger';
 
 import { fetchItemMiddleware, assertItemPresent } from '../../middlewares/fetch-item';
 import { fetchSatchelMiddleware, assertSatchelPresent} from '../../middlewares/fetch-satchel';
@@ -10,7 +11,6 @@ import metaArmor from '../../models/metaArmor';
 import metaWeapon from '../../models/metaWeapon';
 
 import { ITEM_RARITIES } from '../../globals';
-import logger from '../../logger';
 
 const router = express.Router();
 
@@ -31,7 +31,7 @@ router.post(
     param('item_uuid')
       .isUUID(4)
       .withMessage('Invalid UUID format'),
-    ], 
+    ],
     asyncHandler(fetchItemMiddleware),
     asyncHandler(fetchSatchelMiddleware),
     asyncHandler(async (req: Request, res: Response) => {

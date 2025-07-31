@@ -2,11 +2,11 @@
 
 import express, { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator';
+import logger from '../../logger';
 
 import { fetchSatchelMiddleware, assertSatchelPresent } from '../../middlewares/fetch-satchel';
 
 import { AMMUNITIONS } from '../../globals';
-import logger from '../../logger';
 
 const router = express.Router();
 

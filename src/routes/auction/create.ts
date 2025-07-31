@@ -82,12 +82,9 @@ router.post(
         }
       });
     } catch (err) {
-      logger.error(`Auction.id:${uuid} creation failed: ${err}`)
-      if (err instanceof Error) {
-        if (err.name === 'ValidationError') {
-          return res.status(400).json({ success: false, msg: err.message, payload: null });
-        }
-      }
+      const msg = `Auction.id:${uuid} creation failed: ${err}`
+      logger.error(msg)
+      return res.status(400).json({ success: false, msg: msg, payload: null });
     }
 }));
 

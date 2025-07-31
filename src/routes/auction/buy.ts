@@ -35,7 +35,7 @@ router.post(
 
     try {
       await req.auction.deleteOne(); // This deletes the document from MongoDB
-      logger.debug(`Auction.id:${auction_uuid} destroyed`);
+      logger.verbose(`Auction.id:${auction_uuid} destroyed`);
     } catch (err) {
       logger.error(`Auction.id:${auction_uuid} deletion failed: ${err}`)
     }
