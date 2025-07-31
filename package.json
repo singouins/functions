@@ -7,8 +7,10 @@
     "build": "tsc",
     "dev-item": "ts-node-dev --respawn src/index-fn-item.ts",
     "dev-auction": "ts-node-dev --respawn src/index-fn-auction.ts",
+    "dev-bazaar": "ts-node-dev --respawn src/index-fn-bazaar.ts",
     "start-item": "node dist/index-fn-item.js",
     "start-auction": "node dist/index-fn-auction.js",
+    "start-bazaar": "node dist/index-fn-bazaar.js",
     "start": "while true; do sleep 30; done;"
   },
   "keywords": [],

@@ -33,6 +33,7 @@ export interface SatchelAmmo {
   grenade: number;
   rocket: number;
   shell: number;
+  [key: string]: number;
 }
 
 interface SatchelCurrency {
