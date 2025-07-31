@@ -1,8 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { param, validationResult } from 'express-validator';
-
 import logger from '../../logger';
-import Item from '../../models/Item';
+
+import { fetchItemMiddleware, assertItemPresent } from '../../middlewares/fetch-item';
+
 import Auction from '../../models/Auction';
 import metaWeapon from '../../models/metaWeapon';
 
@@ -22,7 +23,9 @@ router.post(
       .withMessage('Invalid UUID format'),
     param('price') // Validate that price param is numeric
       .matches(/^\d+$/).withMessage('Price must be numeric'),
-  ], asyncHandler(async (req: Request, res: Response) => {
+  ],
+  asyncHandler(fetchItemMiddleware),
+  asyncHandler(async (req: Request, res: Response) => {
     // Check validation result
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -32,65 +35,50 @@ router.post(
     const { uuid, price } = req.params;
     logger.info(`POST /${uuid}/${price}`);
 
-    // We look for the related Item
-    const item = await Item.findById(uuid).exec();
-    if (!item) {
-      logger.warn(`Item.id:${uuid} not found`);
-      return res.status(200).json({ 
-          success: false,
-          msg: `Item.id:${uuid} not found`,
-          payload: null
-      });
-    } else {
-      logger.verbose(`Item.id:${uuid} found`);
-    }
+    // We check middleware functions didn't screw up
+    assertItemPresent(req)
 
     // We check if it can be auctioned
-    if (item.bound_type != 'BoE' && item.bound) {
-      logger.warn(`Item.id:${uuid} cannot be auctioned`);
-      return res.status(200).json({ 
-          success: false,
-          msg: `Item.id:${uuid} cannot be auctioned`,
-          payload: item
-      });
+    if (req.item.bound_type != 'BoE' && req.item.bound) {
+      const msg = `Item.id:${uuid} cannot be auctioned`
+      logger.warn(msg);
+      return res.status(200).json({ success: false, msg: msg, payload: req.item });
     }
 
     // We look for the related meta (Item.metaid)
-    const meta = await metaWeapon.findOne({ _id: Number(item.metaid) }).exec();
+    const meta = await metaWeapon.findOne({ _id: Number(req.item.metaid) }).exec();
     if (!meta) {
-      logger.warn(`metaWeapon.id:${item.metaid} not found`);
-      return res.status(200).json({ 
-          success: false,
-          msg: `metaWeapon.id:${item.metaid} not found`,
-          payload: null
-      });
+      const msg = `metaWeapon.id:${req.item.metaid} not found`
+      logger.warn(msg);
+      return res.status(200).json({ success: false, msg: msg, payload: null });
     } else {
-      logger.verbose(`metaWeapon.id:${item.metaid} found`);
+      logger.verbose(`metaWeapon.id:${req.item.metaid} found`);
     }
 
     try {
       const auction = await Auction.create({
         item: {
-          id: item.id,
-          metaid: item.metaid,
-          metatype: item.metatype,
+          id: req.item.id,
+          metaid: req.item.metaid,
+          metatype: req.item.metatype,
           name: meta.name,
-          rarity: item.rarity,
+          rarity: req.item.rarity,
         },
         price: price,
         seller: {
-          id: item.bearer,
+          id: req.item.bearer,
           name: 'Best Seller',
         }
       });
 
-      logger.verbose(`Auction.id:${auction.id} created`);
+      const msg = `Auction.id:${auction.id} created`
+      logger.verbose(msg);
       return res.status(201).json({
         success: true,
-        msg: `Auction.id:${auction.id} created successfully`,
+        msg: msg,
         payload: {
           auction: auction,
-          item: item,
+          item: req.item,
         }
       });
     } catch (err) {

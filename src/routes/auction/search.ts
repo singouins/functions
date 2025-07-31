@@ -20,12 +20,9 @@ router.post('/search', asyncHandler(async (req: Request, res: Response) => {
   const filter = parseFilter(JSON.stringify(req.body));
   const results = await Auction.find(filter).exec();
 
-  logger.verbose(`Search request successful`);
-  return res.status(200).json({
-    success: true,
-    msg: `Search request successful`,
-    payload: results
-  });
+  const msg = `Search request successful`
+  logger.verbose(msg);
+  return res.status(204).json({ success: true, msg: msg, payload: results });
 }));
 
 export default router;
