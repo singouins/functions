@@ -46,26 +46,44 @@ router.post(
     {
       var price = + AMMUNITIONS[caliber]['price'] * 10
       var quantity = - 10
+
+      // We need to check there is enough ammo to sell
+      if (req.satchel.ammo[caliber] < Math.abs(quantity)) {
+        const msg = `Satchel.id:${req.satchel.id} has not enough ${caliber} (${req.satchel.ammo[caliber]})`
+        logger.verbose(msg);
+        return res.status(200).json({
+          success: false,
+          msg: msg,
+          payload: {
+            satchel: req.satchel
+          }
+        });
+      }
+
+      var ret_msg = `Ammo:${caliber} sold successfully (${quantity} for ${Math.abs(price)})`
     } else if ( action == 'buy') {
       var price = - AMMUNITIONS[caliber]['price'] * 10
       var quantity = 10
+
+      // We need to check there is enough currency to buy
+      const curr = req.satchel.currency.banana
+      if (curr < Math.abs(price)) {
+        const msg = `Satchel.id:${req.satchel.id} has not enough currency to buy (${curr})`
+        logger.verbose(msg);
+        return res.status(200).json({
+          success: false,
+          msg: msg,
+          payload: {
+            satchel: req.satchel
+          }
+        });
+      }
+
+      var ret_msg = `Ammo:${caliber} bought successfully (${quantity} for ${Math.abs(price)})`
     } else {
       const msg = `Price:${caliber} not found`
       logger.warn(msg);
       return res.status(200).json({ success: false, msg: msg, payload: null });
-    }
-
-    // We need to check there is enough ammo to sell
-    if (req.satchel.ammo[caliber] < Math.abs(quantity)) {
-      const msg = `Satchel.id:${req.satchel.id} has not enough ${caliber} (${req.satchel.ammo[caliber]})`
-      logger.verbose(msg);
-      return res.status(200).json({
-        success: false,
-        msg: msg,
-        payload: {
-          satchel: req.satchel
-        }
-      });
     }
 
     // We update Satchel
@@ -80,11 +98,10 @@ router.post(
       return res.status(200).json({ success: false, msg: msg, payload: null });
     }
 
-    const msg = `Ammo:${caliber} bought successfully (${quantity} for ${Math.abs(price)})`
-    logger.verbose(msg);
+    logger.verbose(ret_msg);
     return res.status(200).json({
       success: true,
-      msg: msg,
+      msg: ret_msg,
       payload: {
         satchel: req.satchel
       }
