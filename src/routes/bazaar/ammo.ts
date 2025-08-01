@@ -57,7 +57,7 @@ router.post(
 
     // We need to check there is enough ammo to sell
     if (req.satchel.ammo[caliber] < Math.abs(quantity)) {
-      const msg = `Satchel.id:${req.satchel.id} has not enough ${caliber} (satchel.ammo[caliber])`
+      const msg = `Satchel.id:${req.satchel.id} has not enough ${caliber} (${req.satchel.ammo[caliber]})`
       logger.verbose(msg);
       return res.status(200).json({
         success: false,
