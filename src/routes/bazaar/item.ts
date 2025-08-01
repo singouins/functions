@@ -103,7 +103,9 @@ router.post(
       success: true,
       msg: msg,
       payload: {
-        satchel: req.satchel
+        item: req.item,
+        satchel: req.satchel,
+        transaction: { name: meta.name, price: price }
       }
     });
 

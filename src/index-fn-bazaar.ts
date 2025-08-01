@@ -14,8 +14,8 @@ const PORT = 3000;
 
 app.use(express.json());
 app.use('/', healthRoute);    // GET    /health
-app.use('/', ammoRoute);      // POST   /:uuid/:action/ammo/:caliber
-app.use('/', itemRoute);      // POST   /:uuid/:action/item/:item_uuid
+app.use('/', ammoRoute);      // POST   /:creature_uuid/:action/ammo/:caliber
+app.use('/', itemRoute);      // POST   /:creature_uuid/:action/item/:item_uuid
 
 connectMongo()
   .then(() => {
